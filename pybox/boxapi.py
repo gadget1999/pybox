@@ -21,7 +21,7 @@ from poster.encode import multipart_encode
 from poster.streaminghttp import register_openers
 from mechanize._mechanize import FormNotFoundError
 
-from pybox.utils import encode, get_browser, get_logger, get_sha1, is_posix, \
+from utils import encode, get_browser, get_logger, get_sha1, is_posix, \
     stringify, unzip_stream, retry, suppress, suppress_exception, \
     JobQueue, threaded
 
@@ -230,7 +230,7 @@ class BoxApi(object):
         try:
             self._redirect_uri = conf_parser.get("app", "redirect_uri")
         except ConfigParser.NoOptionError:
-            self._redirect_uri = "http://localhost"
+            self._redirect_uri = "http://localhost:8080"
         self._access_token = None
         self._refresh_token = None
         self._token_time = None
@@ -370,23 +370,31 @@ class BoxApi(object):
     def _automate(cls, url, login, password):
         browser = get_browser(True)
 
+        logger.debug("Open URL: {}".format(url))
         browser.open(url)  # suppress output?
 
+        logger.debug("Select form")
         browser.select_form(name='login_form')
         browser['login'] = login
         browser['password'] = password
 
+        logger.debug("Submit login form")
         browser.submit()
         if not browser.viewing_html():
             raise StatusError("something is wrong when browsing HTML")
 
+        logger.debug("Load consent form")
         browser.select_form(name='consent_form')
 
+        logger.debug("Submit consent form")
         response = browser.submit()
         if not browser.viewing_html():
             raise StatusError("something is wrong when browsing HTML")
 
+        logger.debug("Get redirect URL")
         url = response.geturl()
+        logger.debug("Redirect URL: {}".format(url))
+
         import urlparse
         parsed = urlparse.parse_qs(urlparse.urlparse(url).query)
         return parsed['code'][0], parsed['state'][0]
