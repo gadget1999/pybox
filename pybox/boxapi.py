@@ -945,6 +945,16 @@ class BoxApi(object):
             if file_type == 'file':
                 self._download_file((file_id, file_name, f['sha1']),
                                     localdir, verbose, ignore=ignore)
+                localfile = os.path.join(localdir, file_name)
+                if os.path.exists(localfile):
+                    # check
+                    sha1 = f['sha1']
+                    if get_sha1(localfile) == sha1:
+                        logger.info(u"Duplicate file {} found. Deleting remote file...".format(file_name))
+                        self.remove(file_id)
+                        continue
+                # download
+                self._download_file(file_id, localdir, verbose)
             elif file_type == 'folder':
                 self._download_dir((file_id, file_name),
                                    localdir, ignore, verbose)
@@ -1088,8 +1098,8 @@ class BoxApi(object):
         if self._precheck and not remote_id:
             remote_id = self._check_file_on_server(upload_file, parent)
             if remote_id is True:
-                logger.info(u"skip uploading file: {}(same sha1)".format(
-                    upload_file))
+                logger.info(u"Duplicate file found: {}. Deleting on local...".format(upload_file))
+                os.remove(upload_file)
                 return
 
         url = self.UPLOAD_URL.format(("/" + remote_id) if remote_id else "")
