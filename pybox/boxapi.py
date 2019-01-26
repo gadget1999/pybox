@@ -951,8 +951,6 @@ class BoxApi(object):
         for f in files:
             file_type, file_id, file_name = f['type'], f['id'], f['name']
             if file_type == 'file':
-                self._download_file((file_id, file_name, f['sha1']),
-                                    localdir, verbose, ignore=ignore)
                 localfile = os.path.join(localdir, file_name)
                 if os.path.exists(localfile):
                     # check
@@ -962,7 +960,8 @@ class BoxApi(object):
                         self.remove(file_id)
                         continue
                 # download
-                self._download_file(file_id, localdir, verbose)
+                self._download_file((file_id, file_name, f['sha1']),
+                                    localdir, verbose, ignore=ignore)
             elif file_type == 'folder':
                 self._download_dir((file_id, file_name),
                                    localdir, ignore, verbose)
