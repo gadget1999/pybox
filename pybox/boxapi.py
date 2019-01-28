@@ -1005,7 +1005,7 @@ class BoxApi(object):
         size = int(meta.getheaders("Content-Length")[0])
         logger.debug("filename: {} with size: {}".format(name, size))
 
-        BLOCK_SIZE = 65536
+        BLOCK_SIZE = 655360
         written = 0.0
         progress_chars = ['-', '\\', '|', '/']
         loop = 0
