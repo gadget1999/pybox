@@ -239,7 +239,7 @@ class BoxApi(object):
         try:
             self._threads = conf_parser.getint("app", "threads")
         except ConfigParser.NoOptionError:
-            self._threads = 5
+            self._threads = 1
         except ValueError:
             raise ConfigError("threads '{}' should be an int".format(
                 conf_parser.get("app", "threads")))
