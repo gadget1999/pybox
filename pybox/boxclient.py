@@ -9,8 +9,8 @@ import sys
 import getpass
 from optparse import OptionParser
 
-from pybox.boxapi import BoxApi, ConfigError, StatusError
-from pybox.utils import decode_args, get_logger, print_unicode, \
+from boxapi import BoxApi, ConfigError, StatusError
+from utils import decode_args, get_logger, print_unicode, \
     user_of_email, stringify
 
 logger = get_logger()
